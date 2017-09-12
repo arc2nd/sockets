@@ -2,8 +2,18 @@
 #James Parks
 #09/11/17
 
+import sys
 import struct
 import socket
+from optparse import OptionParser
+
+def parse_args(all_args):
+    parser = OptionParser(version = '%prog 1.0')
+    parser.add_option('-s', '--server', action='store_true', help='run as server')
+    parser.add_option('-c', '--client', action='store_true', help='run as client')
+
+    options, args = parser.parse_args(all_args)
+    return options, args
 
 class mysocket:
     def __init__(self, sock=None, host=None, port=None):
@@ -90,3 +100,14 @@ class mysocket:
                 self._log(1, 'sending ack to client')
             finally:
                 clientsocket.close()
+
+if __name__ == '__main__':
+    options, args = parse_args(sys.argv[1:])
+    host = 'gully'
+    port = 50007
+    mys = mysocket()
+    if options.server:
+        mys.serve(host=host, port=port)
+
+
+
