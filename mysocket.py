@@ -48,7 +48,8 @@ class mysocket:
 
             # look for ack
             isAck = self.recv_msg(local_sock)
-            if isAck == 'ack':
+            self._log(1, 'isAck: {}'.format(isAck))
+            if 'ack' in isAck:
                 self._log(1, 'message receipt acknowledged')
             else:
                 self._log(1, 'message receipt nak: {}'.format(isAck))
@@ -57,6 +58,9 @@ class mysocket:
         finally:
             self._log(1, 'closing socket')
             local_sock.close()
+
+    def sendAck(self, sock=None, msg=None):
+        sock.sendall(msg)
 
     def recv_msg(self, sock):
         raw_msglen = self.recvall(sock, 4)
@@ -105,7 +109,7 @@ class mysocket:
                 msg = self.recv_msg(clientsocket)
                 self._log(1, 'msg rcvd: {}'.format(msg))
                 #clientsocket.sendall(msg)
-                self.sendMessage(local_sock=clientsocket, msg='ack')
+                self.sendAck(local_sock=clientsocket, msg='ack')
                 self._log(1, 'sending ack to client')
             finally:
                 clientsocket.close()
