@@ -12,7 +12,7 @@ def parse_args(all_args):
     parser.add_option('-s', '--server', action='store_true', help='run as server')
     parser.add_option('-c', '--client', action='store_true', help='run as client')
     parser.add_option('--host', dest='host', help='the host computer')
-    parser.add_options('-p', '--port', dest='port', help='the port number')
+    parser.add_option('-p', '--port', type="int", dest='port', help='the port number')
 
     options, args = parser.parse_args(all_args)
     return options, args
@@ -24,7 +24,7 @@ class mysocket:
         else:
             self.sock = sock
         self.host = host
-        self.port = port
+        self.port = int(port)
         self.verbosity = 1
 
     def _log(self, priority, comment):
