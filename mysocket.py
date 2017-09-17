@@ -41,7 +41,6 @@ class mysocket:
             if not sock:
                 self._log(6, 'making socket')
                 sock = self.sock
-                print(sock)
             msg = struct.pack('>i', len(msg)) + msg
             self._log(6, 'packed: {}'.format(msg))
             sock.sendall(msg)
