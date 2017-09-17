@@ -39,16 +39,16 @@ class mysocket:
         try:
             self.connect()
             if not sock:
-                self._log(1, 'making socket')
+                self._log(6, 'making socket')
                 sock = self.sock
                 print(sock)
             msg = struct.pack('>i', len(msg)) + msg
-            self._log(1, 'packed: {}'.format(msg))
+            self._log(6, 'packed: {}'.format(msg))
             sock.sendall(msg)
 
             # look for ack
             isAck = self.recv_msg(sock)
-            self._log(1, 'isAck: {}'.format(isAck))
+            self._log(6, 'isAck: {}'.format(isAck))
             if 'ack' in isAck:
                 self._log(1, 'message receipt acknowledged')
             else:
@@ -80,7 +80,7 @@ class mysocket:
                 return None
             data = ''.join(chunks)
         #data = ''.join(chunks)
-        self._log(1, data)
+        self._log(6, data)
         return data
 
     """def myreceive(self):
@@ -111,7 +111,7 @@ class mysocket:
                 self._log(1, 'msg rcvd: {}'.format(msg))
                 #clientsocket.sendall(msg)
                 self.sendAck(sock=clientsocket, msg='ack')
-                self._log(1, 'sending ack to client')
+                self._log(6, 'sending ack to client')
             except:
                 self._loc(1, sys.exc_info())
             finally:
