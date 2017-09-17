@@ -59,8 +59,9 @@ class mysocket:
             self._log(1, 'closing socket')
             sock.close()
 
-    def sendAck(self, sock=None, msg=None):
-        sock.sendall('ack')
+    def sendAck(self, sock=None, msg='ack'):
+        msg = struct.pack('>i', len(msg)) + msg
+        sock.sendall(msg)
 
     def recv_msg(self, sock):
         raw_msglen = self.recvall(sock, 4)
