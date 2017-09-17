@@ -11,6 +11,8 @@ def parse_args(all_args):
     parser = OptionParser(version = '%prog 1.0')
     parser.add_option('-s', '--server', action='store_true', help='run as server')
     parser.add_option('-c', '--client', action='store_true', help='run as client')
+    parser.add_option('--host', dest='host', help='the host computer')
+    parser.add_options('-p', '--port', dest='port', help='the port number')
 
     options, args = parser.parse_args(all_args)
     return options, args
@@ -35,6 +37,7 @@ class mysocket:
 
     def sendMessage(self, msg=None):
         try:
+            self.connect()
             msg = struct.pack('>i', len(msg)) + msg
             self._log(6, 'packed: {}'.format(msg))
             self.sock.sendall(msg)
@@ -44,7 +47,7 @@ class mysocket:
             if isAck == 'ack':
                 self._log(3, 'message receipt acknowledged')
             else:
-                self._log(1, 'message receipt un-ack: {}'.format(isAck))
+                self._log(1, 'message receipt nak: {}'.format(isAck))
         finally:
             self._log(1, 'closing socket')
             self.sock.close()
@@ -103,11 +106,16 @@ class mysocket:
 
 if __name__ == '__main__':
     options, args = parse_args(sys.argv[1:])
-    host = 'gully'
-    port = 50007
-    mys = mysocket()
+    if options.host:
+        host = options.host
+    else:
+        host = socket.gethostname()
+    port = options.port
+    #host = 'gully'
+    #port = 50007
+    mys = mysocket(host=host, port=port)
     if options.server:
-        mys.serve(host=host, port=port)
+        mys.serve()
 
 
 
