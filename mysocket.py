@@ -35,22 +35,28 @@ class mysocket:
         self.sock.connect((self.host, self.port))
         self._log(1, 'making connection to: {}\nport: {}'.format(self.host, self.port))
 
-    def sendMessage(self, sock=None, msg=None):
+    def sendMessage(self, local_sock=None, msg=None):
         try:
             self.connect()
+            if not local_sock:
+                self._log(1, 'making socket')
+                local_sock = self.sock
+                print(local_sock)
             msg = struct.pack('>i', len(msg)) + msg
-            self._log(6, 'packed: {}'.format(msg))
-            sock.sendall(msg)
+            self._log(1, 'packed: {}'.format(msg))
+            local_sock.sendall(msg)
 
             # look for ack
-            isAck = self.recv_msg(sock)
+            isAck = self.recv_msg(local_sock)
             if isAck == 'ack':
-                self._log(3, 'message receipt acknowledged')
+                self._log(1, 'message receipt acknowledged')
             else:
                 self._log(1, 'message receipt nak: {}'.format(isAck))
+        except:
+            self._log(1, sys.exc_info())
         finally:
             self._log(1, 'closing socket')
-            self.sock.close()
+            local_sock.close()
 
     def recv_msg(self, sock):
         raw_msglen = self.recvall(sock, 4)
@@ -98,8 +104,8 @@ class mysocket:
                 # while True:
                 msg = self.recv_msg(clientsocket)
                 self._log(1, 'msg rcvd: {}'.format(msg))
-                clientsocket.sendall(msg)
-                self.sendMessage(sock=clientsocket, msg='ack')
+                #clientsocket.sendall(msg)
+                self.sendMessage(local_sock=clientsocket, msg='ack')
                 self._log(1, 'sending ack to client')
             finally:
                 clientsocket.close()
