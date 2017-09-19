@@ -13,6 +13,7 @@ def parse_args(all_args):
     parser.add_option('-c', '--client', action='store_true', help='run as client')
     parser.add_option('--host', dest='host', help='the host computer')
     parser.add_option('-p', '--port', type="int", dest='port', help='the port number')
+    parser.add_option('-m', '--msg', type='str', dest='msg', help='the message to send')
 
     options, args = parser.parse_args(all_args)
     return options, args
@@ -33,7 +34,7 @@ class mysocket:
 
     def connect(self):
         self.sock.connect((self.host, self.port))
-        self._log(1, 'making connection to: {}\nport: {}'.format(self.host, self.port))
+        self._log(1, 'making connection to: {}:{}'.format(self.host, self.port))
 
     def sendMessage(self, sock=None, msg=None):
         try:
@@ -57,6 +58,13 @@ class mysocket:
         finally:
             self._log(1, 'closing socket')
             sock.close()
+
+    def send(self, msg=None):
+        #try:
+        #    self.connect()
+        #except:
+        #    self._log(1, 'There was a connetion error')
+        self.sendMessage(sock=self.sock, msg=msg)
 
     def sendAck(self, sock=None, msg='ack'):
         msg = struct.pack('>i', len(msg)) + msg
@@ -128,6 +136,7 @@ if __name__ == '__main__':
     mys = mysocket(host=host, port=port)
     if options.server:
         mys.serve()
-
+    if options.client:
+        mys.send(options.msg)
 
 
