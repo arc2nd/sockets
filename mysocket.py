@@ -49,12 +49,17 @@ class mysocket:
             # look for ack
             isAck = self.recv_msg(sock)
             self._log(6, 'isAck: {}'.format(isAck))
-            if 'ack' in isAck:
-                self._log(1, 'message receipt acknowledged')
+            if isAck:
+                if 'ack' in isAck:
+                    self._log(1, 'message receipt acknowledged')
+                else:
+                    self._log(1, 'message receipt nak: {}'.format(isAck))
             else:
-                self._log(1, 'message receipt nak: {}'.format(isAck))
+                self._log(1, 'no ack')
         except:
             self._log(1, sys.exc_info())
+            import traceback
+            traceback.print_tb(sys.exc_info()[-1])
         finally:
             self._log(1, 'closing socket')
             sock.close()
