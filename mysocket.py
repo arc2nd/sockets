@@ -2,6 +2,12 @@
 #James Parks
 #09/11/17
 
+# Usage:
+# on server computer: ./mysocket.py -s --host ???.???.???.??? -p 8080 
+# on client computer: ./mysocket.py -c --host ???.???.???.??? -p 8080 -m 'I am a test message'
+
+# TODO: Find a better way to automatically get the server host's IP, not just hostname
+
 import sys
 import struct
 import socket
@@ -17,6 +23,13 @@ def parse_args(all_args):
 
     options, args = parser.parse_args(all_args)
     return options, args
+
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(('8.8.8.8', 53))
+    ip = s.getsockname()[0]
+    s.close()
+    return ip
 
 class mysocket:
     def __init__(self, sock=None, host=None, port=None):
@@ -40,15 +53,15 @@ class mysocket:
         try:
             self.connect()
             if not sock:
-                self._log(6, 'making socket')
+                self._log(1, 'making socket')
                 sock = self.sock
             msg = struct.pack('>i', len(msg)) + msg
-            self._log(6, 'packed: {}'.format(msg))
+            self._log(1, 'packed: {}'.format(msg))
             sock.sendall(msg)
 
             # look for ack
             isAck = self.recv_msg(sock)
-            self._log(6, 'isAck: {}'.format(isAck))
+            self._log(1, 'isAck: {}'.format(isAck))
             if isAck:
                 if 'ack' in isAck:
                     self._log(1, 'message receipt acknowledged')
@@ -131,17 +144,23 @@ class mysocket:
 
 if __name__ == '__main__':
     options, args = parse_args(sys.argv[1:])
+    print('parsed')
+    print(options)
     if options.host:
         host = options.host
     else:
-        host = socket.gethostname()
+        # host = socket.gethostname()
+        host = get_ip()
+        print('ip: {}:{}'.format(host, options.port))
     port = options.port
     #host = 'gully'
     #port = 50007
     mys = mysocket(host=host, port=port)
+    print('created mys object')
     if options.server:
         mys.serve()
     if options.client:
+        print('a client')
         mys.send(options.msg)
 
 
